@@ -3,14 +3,11 @@ package com.morsecode;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-public class Screen extends JFrame implements MouseListener,ActionListener {
+public class Screen extends JFrame implements MouseListener,ActionListener, KeyListener {
     JTabbedPane tabs = new JTabbedPane();
     Font font1 = new Font("Arial", Font.BOLD, 20);
     Font font2 = new Font("Arial", Font.PLAIN, 16);
@@ -18,6 +15,7 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
     Icon rightClickImg = new ImageIcon("src/com/morsecode/mouseRightClick.jpg");
     Icon leftClickImg = new ImageIcon("src/com/morsecode/mouseLeftClick.jpg");
     Hashtable<String,String> morse2English=new Hashtable<String,String>();
+    Hashtable<String,String> english2Morse=new Hashtable<String,String>();
     JPanel englishToMorse;
     JPanel morseToEnglish;
     JTextField m2eMorseDisplay;
@@ -28,6 +26,11 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
     JLabel m2eRightClickLabel;
     JLabel m2eLeftClickLabel;
     JLabel m2eMiddleClickLabel;
+    JTextArea e2mMorseDisplay;
+    JTextArea e2mEnglishDisplay;
+    JLabel e2mEnglishLabel;
+    JLabel e2mMorseLabel;
+
     public void button1Pressed(){
         m2eMorseDisplay.setFont(font1);
         if(m2eMorseDisplay.getText().equals("enter your morse code!")){
@@ -43,6 +46,7 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
         }else{
             m2eMorseDisplay.setText(m2eMorseDisplay.getText()+" ");
         }
+        morseCodeTranslate();
     }
     public void button3Pressed(){
         m2eMorseDisplay.setFont(font1);
@@ -76,17 +80,18 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
         if(e.getButton()==3){
             button3Pressed();
         }
-        morseCodeTranslate();
     }
 
     private void morseCodeTranslate() {
         String un_en_sms=m2eMorseDisplay.getText();
-        int un_en_sms_separator_index=un_en_sms.indexOf(" ");
-        if(un_en_sms_separator_index!=-1){
-            String sms=un_en_sms.trim();
-            if(m2eEnglishDisplay.getText().equals("Result"))m2eEnglishDisplay.setText(morse2English.get(sms));
-            else m2eEnglishDisplay.setText(m2eEnglishDisplay.getText()+morse2English.get(sms));
-            m2eMorseDisplay.setText("");
+        int j=un_en_sms.lastIndexOf(" ");
+        int i=un_en_sms.trim().lastIndexOf(" ");
+        if(i==-1)i=0;
+        String code=un_en_sms.substring(i,j).trim();
+        if(m2eEnglishDisplay.getText().equals("Result")){
+            m2eEnglishDisplay.setText(morse2English.get(code));
+        }else{
+            m2eEnglishDisplay.append(morse2English.get(code));
         }
     }
 
@@ -127,6 +132,7 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
         morse2English.put("._","A");
         morse2English.put("_...","B");
         morse2English.put("_._.","C");
+        morse2English.put("_..","D");
         morse2English.put(".","E");
         morse2English.put(".._.","F");
         morse2English.put("__.","G");
@@ -161,6 +167,43 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
         morse2English.put("____.","9");
         morse2English.put("_____","0");
 
+        english2Morse.put("A","._");
+        english2Morse.put("B","_...");
+        english2Morse.put("C","_._.");
+        english2Morse.put("D","_..");
+        english2Morse.put("E",".");
+        english2Morse.put("F",".._.");
+        english2Morse.put("G","__.");
+        english2Morse.put("H","....");
+        english2Morse.put("I","..");
+        english2Morse.put("J",".___");
+        english2Morse.put("K","_._");
+        english2Morse.put("L","._..");
+        english2Morse.put("M","__");
+        english2Morse.put("N","_.");
+        english2Morse.put("O","___");
+        english2Morse.put("P",".__.");
+        english2Morse.put("Q","__._");
+        english2Morse.put("R","._.");
+        english2Morse.put("S","...");
+        english2Morse.put("T","_");
+        english2Morse.put("U",".._");
+        english2Morse.put("V","..._");
+        english2Morse.put("W",".__");
+        english2Morse.put("X","_.._");
+        english2Morse.put("Y","_.__");
+        english2Morse.put("Z","__..");
+
+        english2Morse.put("1",".____");
+        english2Morse.put("2","..___");
+        english2Morse.put("3","...__");
+        english2Morse.put("4","...._");
+        english2Morse.put("5",".....");
+        english2Morse.put("6","_....");
+        english2Morse.put("7","__...");
+        english2Morse.put("8","___..");
+        english2Morse.put("9","____.");
+        english2Morse.put("0","_____");
 
     }
     public JPanel morseToEnglish(){
@@ -239,6 +282,10 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
     public JPanel englishToMorse(){
         englishToMorse=new JPanel();
         JLabel heading = new JLabel();
+        e2mEnglishDisplay=new JTextArea();
+        e2mMorseDisplay=new JTextArea();
+        e2mEnglishLabel=new JLabel();
+        e2mMorseLabel=new JLabel();
 
         englishToMorse.setBackground(Color.darkGray);
         englishToMorse.setForeground(Color.white);
@@ -249,9 +296,54 @@ public class Screen extends JFrame implements MouseListener,ActionListener {
         heading.setForeground(Color.white);
         heading.setFont(font1);
 
+        e2mEnglishLabel.setText("English");
+        e2mEnglishLabel.setForeground(Color.white);
+        e2mEnglishLabel.setFont(font2);
+        e2mEnglishLabel.setBounds(120,60,100,30);
+
+        e2mMorseLabel.setText("Morse");
+        e2mMorseLabel.setForeground(Color.white);
+        e2mMorseLabel.setFont(font2);
+        e2mMorseLabel.setBounds(320,60,100,30);
+
+        e2mMorseDisplay.setBounds(250,100,205,200);
+        e2mMorseDisplay.setBackground(Color.darkGray);
+        e2mMorseDisplay.setForeground(Color.white);
+        e2mMorseDisplay.setFont(font1);
+        e2mMorseDisplay.setLineWrap(true);
+        e2mMorseDisplay.setEditable(false);
+        e2mMorseDisplay.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+
+        e2mEnglishDisplay.setBounds(40,100,205,200);
+        e2mEnglishDisplay.setBackground(Color.darkGray);
+        e2mEnglishDisplay.setForeground(Color.white);
+        e2mEnglishDisplay.setFont(font2);
+        e2mEnglishDisplay.setLineWrap(true);
+        e2mEnglishDisplay.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+        e2mEnglishDisplay.addKeyListener(this);
+
         englishToMorse.add(heading);
+        englishToMorse.add(e2mEnglishDisplay);
+        englishToMorse.add(e2mMorseDisplay);
+        englishToMorse.add(e2mEnglishLabel);
+        englishToMorse.add(e2mMorseLabel);
         return englishToMorse;
     }
 
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+        String str=english2Morse.get(String.valueOf(e.getKeyChar()).toUpperCase());
+        e2mMorseDisplay.append(" "+str);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
 }
